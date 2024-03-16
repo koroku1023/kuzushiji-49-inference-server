@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  # inference sever
+  app:
+    build: 
+      context: ../ # Dockerfileを実行する際のディレクトリをrootに設定
+      dockerfile: infra/inference_server/Dockerfile
+    container_name: inference-server
+    ports: 
+      - "8000:8000"
+    volumes:
+      - ../app:/app/app
+      - ../model:/app/model
+      - ../training:/app/training
+      - ../data:/app/data
+  # jupyter
+  jupyter: 
+    build: 
+      context: ../
+      dockerfile: infra/jupyter/Dockerfile
+    container_name: jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ../notebook:/home/jovyan/work
+      - ../data:/home/jovyan/data
+    command: start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''
