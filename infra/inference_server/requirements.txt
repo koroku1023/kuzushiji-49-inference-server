@@ -1,3 +1,5 @@
+tqdm
+requests
 fastapi
 uvicorn
 pandas

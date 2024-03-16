@@ -1,4 +1,6 @@
 pandas
 numpy
 matplotlib
+japanize_matplotlib
 seaborn
+scikit-learn
