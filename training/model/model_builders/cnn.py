@@ -1,6 +1,7 @@
 import os
 import sys
 import random
+import copy
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -16,11 +17,13 @@ from utils.criterion import fetch_criterion
 from utils.optimizer import fetch_optimizer
 from utils.scheduler import fetch_scheduler
 from trainer import train_one_epoch
+from evaluator import evaluate
 
 ARGS = {
     "SEED": 42,
     "DEVICE": torch.device("cuda:0" if torch.cuda.is_available() else "cpu"),
     "DATA_DIR": "data/raw",
+    "MODEL_DIR": "model",
     "IMAGE_SIZE": (28, 28),
     "BATCH_SIZE": 64,
     "NUM_CLASSES": 49,
@@ -29,7 +32,7 @@ ARGS = {
     "LR": 1e-05,
     "T_MAX": 500,
     "MIN_LR": 1e-06,
-    "EPOCH": 2,
+    "EPOCH": 3,
 }
 
 
@@ -106,8 +109,13 @@ def main():
         optimizer, T_max=ARGS["T_MAX"], eta_min=ARGS["MIN_LR"]
     )
 
+    best_epoch_loss = np.inf
+    best_accuracy = 0.0
+    best_f1_score = 0.0
+    not_updated_time = 0
     for epoch in range(1, ARGS["EPOCH"] + 1):
 
+        # Train
         model, train_epoch_loss, train_scores = train_one_epoch(
             model,
             train_loader,
@@ -116,6 +124,54 @@ def main():
             loss_fn,
             device,
         )
+        train_accuracy = train_scores["accuracy"]
+        train_f1_score = train_scores["f1_score"]
+        print()
+        print(
+            f"<Train> Epoch: {epoch}, Loss: {train_epoch_loss:.4f}, Accuracy: {train_accuracy:4f}, F1_Score: {train_f1_score:.4f}"
+        )
+
+        # Val
+        val_epoch_loss, val_scores = evaluate(
+            model,
+            val_loader,
+            loss_fn,
+            device,
+        )
+        val_accuracy = val_scores["accuracy"]
+        val_f1_score = val_scores["f1_score"]
+        print(
+            f"<Val> Epoch: {epoch}, Loss: {val_epoch_loss:.4f}, Accuracy: {val_accuracy:4f}, F1_Score: {val_f1_score:.4f}"
+        )
+        print()
+
+        # Early Stopping Check
+        if val_epoch_loss < best_epoch_loss:
+            print(
+                f"Validation Loss Improved ({best_epoch_loss} ---> {val_epoch_loss})"
+            )
+            print()
+            best_epoch_loss = val_epoch_loss
+            best_accuracy = val_accuracy
+            best_f1_score = val_f1_score
+            best_model_wts = copy.deepcopy(model.state_dict())
+            if epoch == ARGS["EPOCH"]:
+                torch.save(
+                    best_model_wts,
+                    os.path.join(ARGS["MODEL_DIR"], "simple_cnn.pickle"),
+                )
+        else:
+            not_updated_time += 1
+            if not_updated_time == 2:
+                torch.save(
+                    best_model_wts,
+                    os.path.join(ARGS["MODEL_DIR"], "simple_cnn.pickle"),
+                )
+                print("Execute Early Stopping")
+
+    print(
+        f"<Best Val Score> Accuracy: {best_accuracy:4f}, F1_Score: {best_f1_score:4f}"
+    )
 
 
 if __name__ == "__main__":
