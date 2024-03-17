@@ -13,11 +13,10 @@ def train_one_epoch(
     model.train()
     dataset_size = 0
     running_loss = 0.0
-    train_loss = []
     true_labels = []
     pred_probs = []
 
-    for batch in tqdm(train_loader, desc="Training", leave=False):
+    for batch in tqdm(train_loader, desc="Train", leave=False):
 
         images, labels = batch
         images = images.to(device)
@@ -30,18 +29,16 @@ def train_one_epoch(
         loss = loss_fn(outputs, labels)
         loss.backward()
         optimizer.step()
-
         scheduler.step()
 
-        train_loss.append(loss.item())
         running_loss += loss.item() * batch_size
         dataset_size += batch_size
-        epoch_loss = running_loss / dataset_size
 
         true_labels.append(labels.detach().cpu().numpy())
         pred_probs.append(outputs.detach().cpu().numpy())
 
-        scores = cal_scores(true_labels, pred_probs)
+    epoch_loss = running_loss / dataset_size
+    scores = cal_scores(true_labels, pred_probs)
 
     gc.collect()
 
