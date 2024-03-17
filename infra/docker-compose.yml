@@ -11,7 +11,6 @@ services:
     volumes:
       - ../app:/app/app
       - ../model:/app/model
-      - ../training:/app/training
       - ../data:/app/data
   # jupyter
   jupyter: 
@@ -24,4 +23,5 @@ services:
     volumes:
       - ../notebook:/home/jovyan/work
       - ../data:/home/jovyan/data
+      - ../training:/home/jovyan/training
     command: start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''

@@ -1,6 +1,9 @@
+tqdm
+requests
 pandas
 numpy
-matplotlib
-japanize_matplotlib
-seaborn
+torch
+torchvision
 scikit-learn
+opencv-python
+albumentations
