@@ -11,12 +11,25 @@ from torch.utils.data import DataLoader, Subset
 sys.path.append("/home/jovyan/training")
 from utils.dataset import CustomDataset
 from preprocessing.preprocess import img_transformer
+from model.architectures.cnn import SimpleCNN
+from utils.criterion import fetch_criterion
+from utils.optimizer import fetch_optimizer
+from utils.scheduler import fetch_scheduler
+from trainer import train_one_epoch
 
 ARGS = {
     "SEED": 42,
     "DEVICE": torch.device("cuda:0" if torch.cuda.is_available() else "cpu"),
     "DATA_DIR": "data/raw",
+    "IMAGE_SIZE": (28, 28),
     "BATCH_SIZE": 64,
+    "NUM_CLASSES": 49,
+    "CRITERION": "CrossEntropyLoss",
+    "OPTIMIZER": "AdamW",
+    "LR": 1e-05,
+    "T_MAX": 500,
+    "MIN_LR": 1e-06,
+    "EPOCH": 2,
 }
 
 
@@ -48,7 +61,7 @@ set_seed(ARGS["SEED"])
 
 def main():
 
-    transformer = img_transformer()
+    transformer = img_transformer(image_size=ARGS["IMAGE_SIZE"])
 
     full_dataset = CustomDataset(
         train_imgs_npz=os.path.join(ARGS["DATA_DIR"], "k49-train-imgs.npz"),
@@ -77,7 +90,32 @@ def main():
         val_dataset, batch_size=ARGS["BATCH_SIZE"], shuffle=False
     )
 
+    # Model
     device = ARGS["DEVICE"]
+    model = SimpleCNN(num_classes=ARGS["NUM_CLASSES"])
+    model.to(device)
+
+    # Criterion, Optimizer, and Scheduler
+    loss_fn = fetch_criterion(ARGS["CRITERION"])
+    optimizer = fetch_optimizer(
+        ARGS["OPTIMIZER"],
+        model=model,
+        lr=ARGS["LR"],
+    )
+    scheduler = fetch_scheduler(
+        optimizer, T_max=ARGS["T_MAX"], eta_min=ARGS["MIN_LR"]
+    )
+
+    for epoch in range(1, ARGS["EPOCH"] + 1):
+
+        model, train_epoch_loss, train_scores = train_one_epoch(
+            model,
+            train_loader,
+            optimizer,
+            scheduler,
+            loss_fn,
+            device,
+        )
 
 
 if __name__ == "__main__":

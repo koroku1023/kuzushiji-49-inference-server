@@ -10,7 +10,9 @@ class CustomDataset(Dataset):
     ):
 
         self.imgs = np.load(train_imgs_npz)["arr_0"]
+        self.imgs = self.imgs[:5000]
         self.labels = np.load(train_labels_npz)["arr_0"]
+        self.labels = self.labels[:5000]
         self.transformer = transformer
 
     def __len__(self):
@@ -18,9 +20,10 @@ class CustomDataset(Dataset):
 
     def __getitem__(self, idx):
 
-        img = np.repeat(img[..., np.newaxis], 3, -1)
+        img = self.imgs[idx]
+        img = np.repeat(img[..., np.newaxis], 3, axis=-1)
         label = self.labels[idx]
 
-        img = self.transformer(img)
+        img = self.transformer(image=img)["image"]
 
         return img, torch.tensor(label, dtype=torch.long)
