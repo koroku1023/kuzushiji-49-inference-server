@@ -32,7 +32,8 @@ async def predict(model_name: str, upload_file: UploadFile = File(...)):
     # TODO: handle multi file extensions
     if file_extension == "npz":
         images = np.load(io.BytesIO(images))["arr_0"]
-        # TODO: handle uploaded only one image
+        if images.ndim == 2:
+            images = np.expand_dims(images, axis=0)
     else:
         return {
             "error": "Unsupported file format. Only npz files are allowed."
