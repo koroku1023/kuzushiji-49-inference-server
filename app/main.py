@@ -1,8 +1,11 @@
 import io
+import os
+from datetime import datetime
 
 from fastapi import FastAPI, File, UploadFile
 import pandas as pd
 import numpy as np
+import pytz
 
 from app.inference.inferences.cnn import cnn_inference
 
@@ -15,9 +18,13 @@ async def read_root():
     return {"Hello": "World"}
 
 
+# TODO: logging
 # TODO: add asynchronous and batch
 @app.post("/predict/{model_name}")
 async def predict(model_name: str, upload_file: UploadFile = File(...)):
+
+    jst = pytz.timezone("Asia/Tokyo")
+    start_timestamp = datetime.now(jst).strftime("%Y%m%d_%H%M%S")
 
     file_extension = upload_file.filename.split(".")[-1]
     images = await upload_file.read()
@@ -25,13 +32,19 @@ async def predict(model_name: str, upload_file: UploadFile = File(...)):
     # TODO: handle multi file extensions
     if file_extension == "npz":
         images = np.load(io.BytesIO(images))["arr_0"]
-        # TODO: save image npz
         # TODO: handle uploaded only one image
     else:
         return {
             "error": "Unsupported file format. Only npz files are allowed."
         }
 
+    # save uploaded file
+    np.savez_compressed(
+        os.path.join(f"data/upload/{start_timestamp}_upload_images.npz"),
+        arr_0=images,
+    )
+
+    # inference
     if model_name == "cnn":
         predict_probas, predictions = cnn_inference("simple_cnn", images[:10])
     else:
