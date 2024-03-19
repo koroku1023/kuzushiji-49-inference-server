@@ -5,7 +5,7 @@ import torch.nn.functional as F
 
 class SimpleCNN(nn.Module):
 
-    def __init__(self, num_classes):
+    def __init__(self, num_classes: int):
 
         super(SimpleCNN, self).__init__()
 
@@ -19,7 +19,7 @@ class SimpleCNN(nn.Module):
         self.fc1 = nn.Linear(in_features=64 * 7 * 7, out_features=128)
         self.fc2 = nn.Linear(in_features=128, out_features=num_classes)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor):
 
         x = F.relu(self.conv1(x))
         x = self.pool(x)

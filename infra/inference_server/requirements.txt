@@ -2,6 +2,7 @@ tqdm
 requests
 fastapi
 uvicorn
+pandas
 numpy
 torch
 torchvision

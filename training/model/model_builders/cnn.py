@@ -3,11 +3,13 @@ import sys
 import random
 import copy
 import logging
+from datetime import datetime
 
 import numpy as np
 from sklearn.model_selection import train_test_split
 import torch
 from torch.utils.data import DataLoader, Subset
+import pytz
 
 
 sys.path.append("/home/jovyan/training")
@@ -25,7 +27,7 @@ ARGS = {
     "DEVICE": torch.device("cuda:0" if torch.cuda.is_available() else "cpu"),
     "DATA_DIR": "data/raw",
     "MODEL_DIR": "model",
-    "LOG_DIR": "log",
+    "LOG_DIR": "log/training",
     "UNDER_SAMPLING": True,
     "IMAGE_SIZE": (28, 28),
     "BATCH_SIZE": 512,
@@ -65,9 +67,14 @@ def set_seed(seed=0):
 
 set_seed(ARGS["SEED"])
 
+# create logfile
+jst = pytz.timezone("Asia/Tokyo")
+start_timestamp = datetime.now(jst).strftime("%Y%m%d_%H%M%S")
 logging.basicConfig(
     level=logging.INFO,
-    filename=os.path.join(ARGS["LOG_DIR"], f"{ARGS['MODEL_NAME']}.log"),
+    filename=os.path.join(
+        ARGS["LOG_DIR"], f"{start_timestamp}_{ARGS['MODEL_NAME']}.log"
+    ),
     filemode="w",
     format="%(asctime)s - %(levelname)s - %(message)s",
 )

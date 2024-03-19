@@ -12,6 +12,7 @@ services:
       - ../app:/app/app
       - ../model:/app/model
       - ../data:/app/data
+      - ../log:/app/log
   # jupyter
   jupyter: 
     build: 

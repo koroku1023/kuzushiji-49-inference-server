@@ -1,9 +1,6 @@
 import os
 import sys
 import random
-import copy
-import logging
-import pickle
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -55,8 +52,6 @@ def set_seed(seed: int = 0):
 
 
 set_seed(ARGS["SEED"])
-
-# TODO: logging
 
 
 def cnn_inference(model_name, images):
