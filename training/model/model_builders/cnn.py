@@ -2,6 +2,7 @@ import os
 import sys
 import random
 import copy
+import logging
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -24,15 +25,18 @@ ARGS = {
     "DEVICE": torch.device("cuda:0" if torch.cuda.is_available() else "cpu"),
     "DATA_DIR": "data/raw",
     "MODEL_DIR": "model",
+    "LOG_DIR": "log",
+    "UNDER_SAMPLING": True,
     "IMAGE_SIZE": (28, 28),
-    "BATCH_SIZE": 64,
+    "BATCH_SIZE": 512,
     "NUM_CLASSES": 49,
+    "MODEL_NAME": "simple_cnn",
     "CRITERION": "CrossEntropyLoss",
     "OPTIMIZER": "AdamW",
     "LR": 1e-05,
     "T_MAX": 500,
     "MIN_LR": 1e-06,
-    "EPOCH": 3,
+    "EPOCH": 25,
 }
 
 
@@ -61,17 +65,27 @@ def set_seed(seed=0):
 
 set_seed(ARGS["SEED"])
 
+logging.basicConfig(
+    level=logging.INFO,
+    filename=os.path.join(ARGS["LOG_DIR"], f"{ARGS['MODEL_NAME']}.log"),
+    filemode="w",
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+
 
 def main():
 
     transformer = img_transformer(image_size=ARGS["IMAGE_SIZE"])
 
+    # Create Dataset
     full_dataset = CustomDataset(
-        train_imgs_npz=os.path.join(ARGS["DATA_DIR"], "k49-train-imgs.npz"),
+        train_images_npz=os.path.join(ARGS["DATA_DIR"], "k49-train-imgs.npz"),
         train_labels_npz=os.path.join(
             ARGS["DATA_DIR"], "k49-train-labels.npz"
         ),
         transformer=transformer,
+        exec_under_sampling=ARGS["UNDER_SAMPLING"],
+        num_classes=ARGS["NUM_CLASSES"],
     )
 
     # Create Train・Val Dataset and DataLoader
@@ -130,6 +144,9 @@ def main():
         print(
             f"<Train> Epoch: {epoch}, Loss: {train_epoch_loss:.4f}, Accuracy: {train_accuracy:4f}, F1_Score: {train_f1_score:.4f}"
         )
+        logging.info(
+            f"<Train> Epoch: {epoch}, Loss: {train_epoch_loss:.4f}, Accuracy: {train_accuracy:.4f}, F1_Score: {train_f1_score:.4f}"
+        )
 
         # Val
         val_epoch_loss, val_scores = evaluate(
@@ -144,6 +161,9 @@ def main():
             f"<Val> Epoch: {epoch}, Loss: {val_epoch_loss:.4f}, Accuracy: {val_accuracy:4f}, F1_Score: {val_f1_score:.4f}"
         )
         print()
+        logging.info(
+            f"<Val> Epoch: {epoch}, Loss: {val_epoch_loss:.4f}, Accuracy: {val_accuracy:.4f}, F1_Score: {val_f1_score:.4f}"
+        )
 
         # Early Stopping Check
         if val_epoch_loss < best_epoch_loss:
@@ -151,6 +171,9 @@ def main():
                 f"Validation Loss Improved ({best_epoch_loss} ---> {val_epoch_loss})"
             )
             print()
+            logging.info(
+                f"Validation Loss Improved ({best_epoch_loss} ---> {val_epoch_loss})"
+            )
             best_epoch_loss = val_epoch_loss
             best_accuracy = val_accuracy
             best_f1_score = val_f1_score
@@ -158,18 +181,27 @@ def main():
             if epoch == ARGS["EPOCH"]:
                 torch.save(
                     best_model_wts,
-                    os.path.join(ARGS["MODEL_DIR"], "simple_cnn.pickle"),
+                    os.path.join(
+                        ARGS["MODEL_DIR"], f"{ARGS['MODEL_NAME']}.pickle"
+                    ),
                 )
         else:
             not_updated_time += 1
             if not_updated_time == 2:
                 torch.save(
                     best_model_wts,
-                    os.path.join(ARGS["MODEL_DIR"], "simple_cnn.pickle"),
+                    os.path.join(
+                        ARGS["MODEL_DIR"], f"{ARGS['MODEL_NAME']}.pickle"
+                    ),
                 )
                 print("Execute Early Stopping")
+                logging.info("Execute Early Stopping")
+                break
 
     print(
+        f"<Best Val Score> Accuracy: {best_accuracy:4f}, F1_Score: {best_f1_score:4f}"
+    )
+    logging.info(
         f"<Best Val Score> Accuracy: {best_accuracy:4f}, F1_Score: {best_f1_score:4f}"
     )
 

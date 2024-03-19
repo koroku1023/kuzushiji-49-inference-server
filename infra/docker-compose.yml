@@ -24,5 +24,6 @@ services:
       - ../notebook:/home/jovyan/work
       - ../data:/home/jovyan/data
       - ../model:/home/jovyan/model
+      - ../log:/home/jovyan/log
       - ../training:/home/jovyan/training
     command: start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''
