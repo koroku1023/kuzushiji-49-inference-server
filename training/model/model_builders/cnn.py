@@ -36,7 +36,7 @@ ARGS = {
     "LR": 1e-05,
     "T_MAX": 500,
     "MIN_LR": 1e-06,
-    "EPOCH": 25,
+    "EPOCH": 5,
 }
 
 
@@ -182,7 +182,7 @@ def main():
                 torch.save(
                     best_model_wts,
                     os.path.join(
-                        ARGS["MODEL_DIR"], f"{ARGS['MODEL_NAME']}.pickle"
+                        ARGS["MODEL_DIR"], f"{ARGS['MODEL_NAME']}.pth"
                     ),
                 )
         else:
@@ -191,7 +191,7 @@ def main():
                 torch.save(
                     best_model_wts,
                     os.path.join(
-                        ARGS["MODEL_DIR"], f"{ARGS['MODEL_NAME']}.pickle"
+                        ARGS["MODEL_DIR"], f"{ARGS['MODEL_NAME']}.pth"
                     ),
                 )
                 print("Execute Early Stopping")
