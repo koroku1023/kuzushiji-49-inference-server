@@ -56,7 +56,7 @@ def set_seed(seed: int = 0):
 
 set_seed(ARGS["SEED"])
 
-# TODO logging
+# TODO: logging
 
 
 def cnn_inference(model_name, images):
