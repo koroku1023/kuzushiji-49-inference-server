@@ -1,12 +1,8 @@
 import io
-import os
 from datetime import datetime
 import logging
 
 from fastapi import FastAPI, File, UploadFile
-import pandas as pd
-import numpy as np
-import pytz
 
 from app.inference.handlers.predict_handler import predict_handler
 
@@ -31,8 +27,7 @@ async def read_root():
 @app.post("/predict/{model_name}")
 async def predict(model_name: str, upload_file: UploadFile = File(...)):
 
-    jst = pytz.timezone("Asia/Tokyo")
-    start_timestamp = datetime.now(jst).strftime("%Y%m%d_%H%M%S")
+    start_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     results, log_text = await predict_handler(
         model_name, upload_file, start_timestamp
