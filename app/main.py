@@ -4,7 +4,10 @@ import logging
 
 from fastapi import FastAPI, File, UploadFile
 
-from app.inference.handlers.predict_handler import predict_handler
+from app.inference.handlers.predict_handler import (
+    predict_handler,
+    async_predict_handler,
+)
 
 
 app = FastAPI()
@@ -23,13 +26,26 @@ async def read_root():
     return {"Hello": "World"}
 
 
-# TODO: add asynchronous and batch
+# TODO: batch
 @app.post("/predict/{model_name}")
 async def predict(model_name: str, upload_file: UploadFile = File(...)):
 
     start_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     results, log_text = await predict_handler(
+        model_name, upload_file, start_timestamp
+    )
+    logging.info(log_text)
+
+    return results
+
+
+@app.post("/async_predict/{model_name}")
+async def async_predict(model_name: str, upload_file: UploadFile = File(...)):
+
+    start_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    results, log_text = await async_predict_handler(
         model_name, upload_file, start_timestamp
     )
     logging.info(log_text)
