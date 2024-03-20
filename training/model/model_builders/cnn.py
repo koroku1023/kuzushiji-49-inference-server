@@ -9,7 +9,6 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import torch
 from torch.utils.data import DataLoader, Subset
-import pytz
 
 
 sys.path.append("/home/jovyan/training")
@@ -28,7 +27,7 @@ ARGS = {
     "DATA_DIR": "data/raw",
     "MODEL_DIR": "model",
     "LOG_DIR": "log/training",
-    "UNDER_SAMPLING": True,
+    "UNDER_SAMPLING": False,
     "IMAGE_SIZE": (28, 28),
     "BATCH_SIZE": 512,
     "NUM_CLASSES": 49,
@@ -38,7 +37,7 @@ ARGS = {
     "LR": 1e-05,
     "T_MAX": 500,
     "MIN_LR": 1e-06,
-    "EPOCH": 5,
+    "EPOCH": 40,
 }
 
 
@@ -68,8 +67,7 @@ def set_seed(seed=0):
 set_seed(ARGS["SEED"])
 
 # create logfile
-jst = pytz.timezone("Asia/Tokyo")
-start_timestamp = datetime.now(jst).strftime("%Y%m%d_%H%M%S")
+start_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 logging.basicConfig(
     level=logging.INFO,
     filename=os.path.join(
@@ -86,10 +84,8 @@ def main():
 
     # Create Dataset
     full_dataset = CustomDataset(
-        train_images_npz=os.path.join(ARGS["DATA_DIR"], "k49-train-imgs.npz"),
-        train_labels_npz=os.path.join(
-            ARGS["DATA_DIR"], "k49-train-labels.npz"
-        ),
+        images_npz=os.path.join(ARGS["DATA_DIR"], "k49-train-imgs.npz"),
+        labels_npz=os.path.join(ARGS["DATA_DIR"], "k49-train-labels.npz"),
         transformer=transformer,
         exec_under_sampling=ARGS["UNDER_SAMPLING"],
         num_classes=ARGS["NUM_CLASSES"],
@@ -146,13 +142,15 @@ def main():
             device,
         )
         train_accuracy = train_scores["accuracy"]
+        train_precision = train_scores["precision"]
+        train_recall = train_scores["recall"]
         train_f1_score = train_scores["f1_score"]
         print()
         print(
-            f"<Train> Epoch: {epoch}, Loss: {train_epoch_loss:.4f}, Accuracy: {train_accuracy:4f}, F1_Score: {train_f1_score:.4f}"
+            f"<Train> Epoch: {epoch}, Loss: {train_epoch_loss:.4f}, Accuracy: {train_accuracy:.4f}, F1_Score: {train_f1_score:.4f}"
         )
         logging.info(
-            f"<Train> Epoch: {epoch}, Loss: {train_epoch_loss:.4f}, Accuracy: {train_accuracy:.4f}, F1_Score: {train_f1_score:.4f}"
+            f"<Train> Epoch: {epoch}, Loss: {train_epoch_loss:.4f}, Accuracy: {train_accuracy:.4f}, Precision: {train_precision:.4f}, Recall: {train_recall:.4f}  F1_Score: {train_f1_score:.4f}"
         )
 
         # Val
@@ -163,13 +161,15 @@ def main():
             device,
         )
         val_accuracy = val_scores["accuracy"]
+        val_precision = val_scores["precision"]
+        val_recall = val_scores["recall"]
         val_f1_score = val_scores["f1_score"]
         print(
-            f"<Val> Epoch: {epoch}, Loss: {val_epoch_loss:.4f}, Accuracy: {val_accuracy:4f}, F1_Score: {val_f1_score:.4f}"
+            f"<Val> Epoch: {epoch}, Loss: {val_epoch_loss:.4f}, Accuracy: {val_accuracy:.4f}, F1_Score: {val_f1_score:.4f}"
         )
         print()
         logging.info(
-            f"<Val> Epoch: {epoch}, Loss: {val_epoch_loss:.4f}, Accuracy: {val_accuracy:.4f}, F1_Score: {val_f1_score:.4f}"
+            f"<Val> Epoch: {epoch}, Loss: {val_epoch_loss:.4f}, Accuracy: {val_accuracy:.4f}, Precision: {val_precision:.4f}, Recall: {val_recall:.4f},  F1_Score: {val_f1_score:.4f}"
         )
 
         # Early Stopping Check
@@ -206,10 +206,10 @@ def main():
                 break
 
     print(
-        f"<Best Val Score> Accuracy: {best_accuracy:4f}, F1_Score: {best_f1_score:4f}"
+        f"<Best Val Score> Accuracy: {best_accuracy:.4f}, F1_Score: {best_f1_score:.4f}"
     )
     logging.info(
-        f"<Best Val Score> Accuracy: {best_accuracy:4f}, F1_Score: {best_f1_score:4f}"
+        f"<Best Val Score> Accuracy: {best_accuracy:.4f}, F1_Score: {best_f1_score:.4f}"
     )
 
 

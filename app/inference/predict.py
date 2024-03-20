@@ -1,4 +1,3 @@
-# form typing import
 import gc
 
 import numpy as np
