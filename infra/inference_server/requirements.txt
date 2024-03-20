@@ -2,9 +2,11 @@ tqdm
 requests
 fastapi
 uvicorn
+pandas
 numpy
 torch
 torchvision
 scikit-learn
 opencv-python
 albumentations
+python-multipart
