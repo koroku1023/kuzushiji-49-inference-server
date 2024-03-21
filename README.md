@@ -72,6 +72,7 @@ Follow these steps to set up your environment:
 ### Supported Models
 
 - **Simple CNN**
+- **DenseNet121**
 
 ### Executing the Training Process
 
