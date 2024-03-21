@@ -29,13 +29,14 @@ def train_one_epoch(
         loss = loss_fn(outputs, labels)
         loss.backward()
         optimizer.step()
-        scheduler.step()
 
         running_loss += loss.item() * batch_size
         dataset_size += batch_size
 
         true_labels.append(labels.detach().cpu().numpy())
         pred_probs.append(outputs.detach().cpu().numpy())
+
+    scheduler.step()
 
     epoch_loss = running_loss / dataset_size
     scores = cal_scores(true_labels, pred_probs)

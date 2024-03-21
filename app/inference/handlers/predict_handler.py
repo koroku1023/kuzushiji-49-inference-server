@@ -8,6 +8,7 @@ import numpy as np
 
 sys.path.append("app/inference")
 from inferences.cnn import cnn_inference
+from inferences.densenet import densenet_inference
 
 
 async def predict_handler(
@@ -35,6 +36,8 @@ async def predict_handler(
     # inference
     if model_name == "cnn":
         predict_probas, predictions = cnn_inference("simple_cnn", images)
+    elif model_name == "densenet":
+        predict_probas, predictions = densenet_inference("densenet", images)
     else:
         log_text = "error: Unsupported model name."
         return {"error": "Unsupported model name."}, log_text
@@ -72,6 +75,10 @@ async def async_predict_handler(
         predict_probas, predictions = await _async_cnn_inference(
             "simple_cnn", images
         )
+    elif model_name == "densenet":
+        predict_probas, predictions = await _async_densenet_inference(
+            "densenet", images
+        )
     else:
         log_text = "error: Unsupported model name."
         return {"error": "Unsupported model name."}, log_text
@@ -85,6 +92,12 @@ async def async_predict_handler(
 async def _async_cnn_inference(model_name: str, images: np.array):
 
     predict_probas, predictions = cnn_inference(model_name, images)
+    return predict_probas, predictions
+
+
+async def _async_densenet_inference(model_name: str, images: np.array):
+
+    predict_probas, predictions = densenet_inference(model_name, images)
     return predict_probas, predictions
 
 

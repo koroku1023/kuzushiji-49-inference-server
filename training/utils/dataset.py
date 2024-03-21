@@ -12,15 +12,15 @@ class CustomDataset(Dataset):
 
     def __init__(
         self,
-        train_images_npz=None,
-        train_labels_npz=None,
+        images_npz=None,
+        labels_npz=None,
         transformer=None,
         exec_under_sampling=False,
         num_classes=None,
     ):
 
-        self.images = np.load(train_images_npz)["arr_0"]
-        self.labels = np.load(train_labels_npz)["arr_0"]
+        self.images = np.load(images_npz)["arr_0"]
+        self.labels = np.load(labels_npz)["arr_0"]
         self.transformer = transformer
 
         if exec_under_sampling:
