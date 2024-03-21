@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader
 sys.path.append("/home/jovyan/training")
 from utils.dataset import CustomDataset
 from preprocessing.preprocess import img_transformer
-from model.architectures.cnn import SimpleCNN
+from model.architectures.densenet import DenseNet_121
 from predict import predict
 
 ARGS = {
@@ -22,10 +22,10 @@ ARGS = {
     "MODEL_DIR": "model",
     "LOG_DIR": "log/test",
     "UNDER_SAMPLING": False,
-    "IMAGE_SIZE": (28, 28),
+    "IMAGE_SIZE": (29, 29),
     "BATCH_SIZE": 512,
     "NUM_CLASSES": 49,
-    "MODEL_NAME": "simple_cnn",
+    "MODEL_NAME": "densenet",
     "CRITERION": "CrossEntropyLoss",
     "OPTIMIZER": "AdamW",
     "LR": 1e-05,
@@ -91,9 +91,9 @@ def main():
 
     # Model
     device = ARGS["DEVICE"]
-    model = SimpleCNN(num_classes=ARGS["NUM_CLASSES"])
+    model = DenseNet_121(num_classes=ARGS["NUM_CLASSES"])
     model.load_state_dict(
-        torch.load(os.path.join(ARGS["MODEL_DIR"], "simple_cnn.pth"))
+        torch.load(os.path.join(ARGS["MODEL_DIR"], "densenet.pth"))
     )
     model.to(device)
 
