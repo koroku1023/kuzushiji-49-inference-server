@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader, Subset
 sys.path.append("app/inference")
 from utils.dataset import CustomDataset
 from utils.preprocess import img_transformer
-from architectures.cnn import SimpleCNN
+from architectures.densenet import DenseNet_121
 from predict import predict
 
 
@@ -20,11 +20,10 @@ ARGS = {
     "DATA_DIR": "data/raw",
     "MODEL_DIR": "model",
     "LOG_DIR": "log",
-    "UNDER_SAMPLING": True,
-    "IMAGE_SIZE": (28, 28),
+    "IMAGE_SIZE": (29, 29),
     "BATCH_SIZE": 512,
     "NUM_CLASSES": 49,
-    "MODEL_NAME": "simple_cnn",
+    "MODEL_NAME": "densenet",
 }
 
 
@@ -54,7 +53,7 @@ def set_seed(seed: int = 0):
 set_seed(ARGS["SEED"])
 
 
-def cnn_inference(model_name, images):
+def densenet_inference(model_name, images):
 
     transformer = img_transformer(image_size=ARGS["IMAGE_SIZE"])
 
@@ -65,9 +64,9 @@ def cnn_inference(model_name, images):
     )
 
     # Load Model
-    model = SimpleCNN(num_classes=ARGS["NUM_CLASSES"])
+    model = DenseNet_121(num_classes=ARGS["NUM_CLASSES"])
     model.load_state_dict(
-        torch.load(os.path.join(ARGS["MODEL_DIR"], "simple_cnn.pth"))
+        torch.load(os.path.join(ARGS["MODEL_DIR"], "densenet.pth"))
     )
     model.to(ARGS["DEVICE"])
 
