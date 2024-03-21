@@ -105,7 +105,9 @@ async def batch_scheduler(
     }
 
 
-def _execute_scheduled_task(model_name, start_timestamp, task_id):
+def _execute_scheduled_task(
+    model_name: str, start_timestamp: str, task_id: str
+):
 
     _, log_text = batch_predict_handler(model_name, start_timestamp, task_id)
     logging.info(f"{task_id}: {log_text}")
