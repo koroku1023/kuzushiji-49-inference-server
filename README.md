@@ -197,7 +197,7 @@ The server returns a confirmation message indicating the scheduled time for the 
 ```
 
 #### Command
-```
+```sh
 curl -X 'POST' \
   'http://localhost:8000/schedule/{model_name}?execute_at=2024-03-22T15%3A51%3A00Z' \
   -H 'accept: application/json' \
@@ -207,10 +207,6 @@ curl -X 'POST' \
 
 #### Output
 After the scheduled batch inference task is executed, the inference results are saved in the data/output/batch/ directory. Each result file is named using the task_id generated during scheduling, ensuring a unique filename for each batch inference task.
-
-
-### Interacting with the Server via Auto-generated Documentation Page
-Alternatively, you can interact with the inference server and test it by visiting the auto-generated documentation page at http://localhost:8000/docs. This interactive API documentation allows you to execute requests directly from your browser and see the responses.
 
 ## Cleanup
 
