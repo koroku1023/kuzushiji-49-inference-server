@@ -2,6 +2,10 @@
 
 This project aims to develop and deploy a machine learning model capable of recognizing Kuzushiji, traditional Japanese cursive script, from images. We process and classify images of handwritten Kuzushiji characters into 49 different Hiragana classes. The project encapsulates the entire workflow from data preprocessing, model training and evaluation, to the final deployment of a FastAPI-based inference server, making it possible to predict Kuzushiji characters from new images through a simple API call.
 
+## Kuzushiji-49 Dataset
+
+The Kuzushiji recognition task is based on the KMNIST dataset, which is a collection of handwritten Hiragana characters. The dataset is designed to serve as a drop-in replacement for the MNIST dataset, offering a more challenging task and promoting the preservation and study of this important aspect of Japanese cultural heritage. For more information about the dataset and to download it, please visit [this link](https://github.com/rois-codh/kmnist?tab=readme-ov-file#kuzushiji-49).
+
 ## Project Highlights
 - **Data Preprocessing**: Implements comprehensive image preprocessing steps including resizing and normalization to prepare the dataset for efficient model training.
 - **Model Training**: Designs and trains a few models using PyTorch, fine-tuned to recognize Kuzushiji characters with high accuracy.
@@ -208,3 +212,13 @@ After the scheduled batch inference task is executed, the inference results are 
 ### Interacting with the Server via Auto-generated Documentation Page
 Alternatively, you can interact with the inference server and test it by visiting the auto-generated documentation page at http://localhost:8000/docs. This interactive API documentation allows you to execute requests directly from your browser and see the responses.
 
+## Cleanup
+
+```
+# Stopping Containers
+docker-compose -f infra/docker-compose.yml stop inference-server jupyter
+
+# Removing Containers
+docker-compose -f infra/docker-compose.yml rm inference-server jupyter
+
+```
