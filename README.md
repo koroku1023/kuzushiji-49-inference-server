@@ -165,6 +165,16 @@ curl -X 'POST' \
   -F 'upload_file=@data/test/{file_name};type=application/x-npz'
 ```
 
+**example**
+
+```sh
+curl -X 'POST' \
+  'http://localhost:8000/predict/cnn' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'upload_file=@data/test/test_image_0.npz;type=application/x-npz'
+```
+
 ### Sending Asynchronous Inference Request
 
 Parameters and Response are the same as Synchronous Inference.
@@ -177,6 +187,16 @@ curl -X 'POST' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'upload_file=@data/test/{file_name};type=application/x-npz'
+```
+
+**example**
+
+```sh
+curl -X 'POST' \
+  'http://localhost:8000/async_predict/cnn' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'upload_file=@data/test/test_image_0.npz;type=application/x-npz'
 ```
 
 ### Sending Batch Inference Request
@@ -199,10 +219,20 @@ The server returns a confirmation message indicating the scheduled time for the 
 #### Command
 ```sh
 curl -X 'POST' \
-  'http://localhost:8000/schedule/{model_name}?execute_at=2024-03-22T15%3A51%3A00Z' \
+  'http://localhost:8000/schedule/{model_name}?execute_at=YYYY-MM-DDThh%3Amm%3AssZ' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'upload_file=@data/test/{file_name};type=application/x-npz'
+```
+
+**example**
+
+```sh
+curl -X 'POST' \
+  'http://localhost:8000/schedule/cnn?execute_at=2024-03-22T15%3A51%3A00Z' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'upload_file=@data/test/test_image_0.npz;type=application/x-npz'
 ```
 
 #### Output
