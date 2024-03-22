@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-  # inference sever
+  # inference server
   app:
     build: 
       context: ../ # Dockerfileを実行する際のディレクトリをrootに設定
