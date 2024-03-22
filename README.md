@@ -2,6 +2,10 @@
 
 This project aims to develop and deploy a machine learning model capable of recognizing Kuzushiji, traditional Japanese cursive script, from images. We process and classify images of handwritten Kuzushiji characters into 49 different Hiragana classes. The project encapsulates the entire workflow from data preprocessing, model training and evaluation, to the final deployment of a FastAPI-based inference server, making it possible to predict Kuzushiji characters from new images through a simple API call.
 
+## Kuzushiji-49 Dataset
+
+The Kuzushiji recognition task is based on the KMNIST dataset, which is a collection of handwritten Hiragana characters. The dataset is designed to serve as a drop-in replacement for the MNIST dataset, offering a more challenging task and promoting the preservation and study of this important aspect of Japanese cultural heritage. For more information about the dataset and to download it, please visit [this link](https://github.com/rois-codh/kmnist?tab=readme-ov-file#kuzushiji-49).
+
 ## Project Highlights
 - **Data Preprocessing**: Implements comprehensive image preprocessing steps including resizing and normalization to prepare the dataset for efficient model training.
 - **Model Training**: Designs and trains a few models using PyTorch, fine-tuned to recognize Kuzushiji characters with high accuracy.
@@ -11,16 +15,20 @@ This project aims to develop and deploy a machine learning model capable of reco
 
 ## Technologies Used
 
+### Device
+- **Apple M1 Pro**
+- **macOS**: 13.4.1
+
 ### Infrastructure
-- **Docker**: version 20.10.17, build 100c701
+- **Docker**: 20.10.17, build 100c701
 
 ### Machine Learning
-- **Python**: version 3.10.10
-- **PyTorch**: 
+- **Python**: 3.10.10
+- **PyTorch**: 2.2.1
 
 ### API Development
-- **FastAPI**: 
-- **Uvicorn**
+- **FastAPI**: 0.110.0
+- **Uvicorn**: 0.29.0
 
 ## Project Structures
 - `app/`: Contains the FastAPI application for the inference server.
@@ -68,6 +76,7 @@ Follow these steps to set up your environment:
 ### Supported Models
 
 - **Simple CNN**
+- **DenseNet121**
 
 ### Executing the Training Process
 
@@ -133,6 +142,7 @@ The server will return the inference results in a JSON format.
 ```
 {
   "model": "cnn",
+  "task_id": "YYYYMMDD_hhmmss_XXXXX",
   "results": [
     {
       "index": 0,
@@ -169,6 +179,42 @@ curl -X 'POST' \
   -F 'upload_file=@data/test/{file_name};type=application/x-npz'
 ```
 
-### Interacting with the Server via Auto-generated Documentation Page
-Alternatively, you can interact with the inference server and test it by visiting the auto-generated documentation page at http://localhost:8000/docs. This interactive API documentation allows you to execute requests directly from your browser and see the responses.
+### Sending Batch Inference Request
 
+#### Parameters
+model_name: (Required, String) The name of the model for inference.
+file_name: (Required, String) The name of the file containing images for inference.
+execute_at: (Required, datetime in ISO 8601 format) Schedule time for the batch inference job. Format: YYYY-MM-DDTHH:MM:SSZ. TimeZone is UTC.
+
+#### Response
+The server returns a confirmation message indicating the scheduled time for the batch inference task.
+
+**example**
+```
+{
+  "message": "Batch prediction task scheduled at 2024-03-22T15:51:00Z"
+}
+```
+
+#### Command
+```sh
+curl -X 'POST' \
+  'http://localhost:8000/schedule/{model_name}?execute_at=2024-03-22T15%3A51%3A00Z' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'upload_file=@data/test/{file_name};type=application/x-npz'
+```
+
+#### Output
+After the scheduled batch inference task is executed, the inference results are saved in the data/output/batch/ directory. Each result file is named using the task_id generated during scheduling, ensuring a unique filename for each batch inference task.
+
+## Cleanup
+
+```
+# Stopping Containers
+docker-compose -f infra/docker-compose.yml stop inference-server jupyter
+
+# Removing Containers
+docker-compose -f infra/docker-compose.yml rm inference-server jupyter
+
+```

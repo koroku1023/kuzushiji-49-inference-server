@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-  # inference sever
+  # inference server
   app:
     build: 
       context: ../ # Dockerfileを実行する際のディレクトリをrootに設定
@@ -27,4 +27,4 @@ services:
       - ../model:/home/jovyan/model
       - ../log:/home/jovyan/log
       - ../training:/home/jovyan/training
-    command: start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''
+    command: /bin/bash -c "python /home/jovyan/training/download/download.py && jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --NotebookApp.token='' --NotebookApp.password='' --allow-root"
