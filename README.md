@@ -38,6 +38,8 @@ The Kuzushiji recognition task is based on the KMNIST dataset, which is a collec
 - `log/`: Logs from training and inference processes.
 - `model/`: Trained model artifacts.
 - `notebook/`: Jupyter notebooks for data exploration and analysis.
+  - `data_analysis.ipynb`: Data Exploration for model training.
+  - `analysis_for_test_data_prediction.ipynb`: Post analysis of densenet prediction.
 - `training/`: Scripts and modules for training the models.
   - `download/`: Scripts for downloading and preparing the dataset.
   - `model/`: 
